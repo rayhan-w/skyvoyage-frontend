@@ -1,3 +1,55 @@
-import Link from "next/link";import {fmt} from "../../../lib/data";
-const rows=[["INV-SV-1001","SV-1001","Demo Customer",32500,"Confirmed"],["INV-SV-1002","SV-1002","Demo Customer",68500,"Requested"],["INV-SV-1003","SV-1003","Rahim Uddin",54900,"Confirmed"]];
-export default function AInvoices(){return(<div><h1 style={{marginTop:0}}>Invoices</h1><div className="panel"><div className="tablewrap"><table><thead><tr><th>Invoice</th><th>Booking</th><th>Customer</th><th>Total</th><th>Status</th><th>View</th></tr></thead><tbody>{rows.map(r=><tr key={r[0]}><td>{r[0]}</td><td>{r[1]}</td><td>{r[2]}</td><td>{fmt(r[3])}</td><td>{r[4]}</td><td><Link href={"/invoice/"+r[1]} style={{color:"#ea580c",fontWeight:700}}>Invoice</Link></td></tr>)}</tbody></table></div><p className="muted">Invoices are auto-created on booking and emailed to the customer (backend feature).</p></div></div>)}
+"use client";
+import Link from "next/link";
+import { useEffect, useState } from "react";
+import { apiFetch, fmt } from "../../../lib/api";
+
+export default function AInvoices() {
+  const [rows, setRows] = useState([]);
+
+  useEffect(() => {
+    apiFetch("/admin/invoices")
+      .then((d) => setRows(d || []))
+      .catch(() => {});
+  }, []);
+
+  return (
+    <div>
+      <h1 style={{ marginTop: 0 }}>Invoices</h1>
+      <div className="panel">
+        <div className="tablewrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Invoice</th>
+                <th>Booking</th>
+                <th>Customer</th>
+                <th>Total</th>
+                <th>Status</th>
+                <th>View</th>
+              </tr>
+            </thead>
+            <tbody>
+              {rows.map((r) => (
+                <tr key={r.id}>
+                  <td>{r.invoiceNo}</td>
+                  <td>{r.booking?.bookingCode}</td>
+                  <td>{r.customerName}</td>
+                  <td>{fmt(r.totalAmount)}</td>
+                  <td>{r.status}</td>
+                  <td>
+                    <Link
+                      href={"/invoice/" + encodeURIComponent(r.invoiceNo)}
+                      style={{ color: "#ea580c", fontWeight: 700 }}
+                    >
+                      Invoice
+                    </Link>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  );
+}

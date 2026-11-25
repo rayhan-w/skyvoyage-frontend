@@ -1,5 +1,96 @@
-"use client";import {Suspense,useEffect,useState} from "react";import {useSearchParams} from "next/navigation";import {fmt,readItems} from "../../lib/data";
-function Inner(){const sp=useSearchParams();const id=sp.get("id")||"SV-1001";const[b,setB]=useState(null);useEffect(()=>{const f=readItems("sv_bookings").find(x=>x.id===id);setB(f||{id,item:"Flight DAC to DXB · Biman Bangladesh",name:"Demo Customer",email:"demo@email.com",date:"12 Nov 2026",total:32500,inv:"INV-"+id})},[id]);
-if(!b)return <div className="panel">Loading invoice...</div>;
-const tax=Math.round(b.total*0.046);return(<div className="panel"><h1 style={{color:"#c2410c"}}>SkyVoyage — Invoice</h1><p><b>Invoice No:</b> {b.inv}<br/><b>Booking ID:</b> {b.id}<br/><b>Customer:</b> {b.name} · {b.email}<br/><b>Date:</b> {b.date}</p><div className="tablewrap"><table><thead><tr><th>Description</th><th>Qty</th><th>Amount</th></tr></thead><tbody><tr><td>{b.item}</td><td>1</td><td>{fmt(b.total-tax)}</td></tr><tr><td>Taxes & Fees</td><td>1</td><td>{fmt(tax)}</td></tr><tr><td><b>Total</b></td><td></td><td><b>{fmt(b.total)}</b></td></tr></tbody></table></div><p className="muted">Booking summary only — no online payment. To confirm, call us at +880 1234 567890 or WhatsApp us. This summary is emailed to the customer after the request (backend feature).</p><button className="btn" onClick={()=>window.print()}>Print / Save PDF</button></div>)}
-export default function Inv(){return(<main className="wrap page" style={{maxWidth:760}}><Suspense><Inner/></Suspense></main>)}
+"use client";
+import { Suspense, useEffect, useState } from "react";
+import { useSearchParams } from "next/navigation";
+import { apiFetch, fmt, getPdfUrl } from "../../lib/api";
+
+function Inner() {
+  const sp = useSearchParams();
+  const id = sp.get("id") || "";
+  const [inv, setInv] = useState(null);
+  const [settings, setSettings] = useState(null);
+  const [err, setErr] = useState("");
+
+  useEffect(() => {
+    apiFetch("/settings")
+      .then((s) => setSettings(s))
+      .catch(() => {});
+
+    if (!id) return;
+    apiFetch(`/invoices/${encodeURIComponent(id)}`)
+      .then((data) => setInv(data))
+      .catch((e) => setErr(e.message || "Invoice not found"));
+  }, [id]);
+
+  if (err) return <div className="panel">{err}</div>;
+  if (!inv) return <div className="panel">Loading invoice...</div>;
+
+  const tax = Math.round(inv.totalAmount * 0.046);
+  const phone = settings?.bookingPhone || settings?.phoneHotline || "";
+
+  return (
+    <div className="panel">
+      <h1 style={{ color: "#c2410c" }}>SkyVoyage — Invoice</h1>
+      <p>
+        <b>Invoice No:</b> {inv.invoiceNo}
+        <br />
+        <b>Booking ID:</b> {inv.booking?.bookingCode}
+        <br />
+        <b>Customer:</b> {inv.customerName} · {inv.customerEmail}
+        <br />
+        <b>Date:</b> {inv.booking?.travelDate}
+        <br />
+        <b>Status:</b> {inv.status}
+      </p>
+      <div className="tablewrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Description</th>
+              <th>Qty</th>
+              <th>Amount</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>{inv.itemDescription}</td>
+              <td>1</td>
+              <td>{fmt(inv.totalAmount - tax)}</td>
+            </tr>
+            <tr>
+              <td>Taxes & Fees</td>
+              <td>1</td>
+              <td>{fmt(tax)}</td>
+            </tr>
+            <tr>
+              <td><b>Total</b></td>
+              <td></td>
+              <td><b>{fmt(inv.totalAmount)}</b></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <p className="muted">
+        Booking summary only — no online payment. To confirm, call us at {phone} or WhatsApp us.
+      </p>
+      <a
+        className="btn"
+        href={getPdfUrl(inv.invoiceNo)}
+        target="_blank"
+        rel="noopener noreferrer"
+        download={`${inv.invoiceNo}.pdf`}
+      >
+        Download PDF
+      </a>
+    </div>
+  );
+}
+
+export default function Inv() {
+  return (
+    <main className="wrap page" style={{ maxWidth: 760 }}>
+      <Suspense>
+        <Inner />
+      </Suspense>
+    </main>
+  );
+}

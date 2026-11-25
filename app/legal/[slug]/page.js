@@ -1,3 +1,23 @@
-export function generateStaticParams(){return[{slug:"privacy"},{slug:"terms"},{slug:"refund"}]}
-const pages={privacy:{t:"Privacy Policy",b:"We collect only the information needed to process your flight, hotel, package and visa bookings — name, contact details and passenger information. Your data is protected, never sold, and used only to complete your booking and send confirmations, invoices and support replies by email."},terms:{t:"Terms & Conditions",b:"Bookings are confirmed after our team contacts you and agrees all details by phone or WhatsApp. No online payment is taken on this website. Fares, availability and package prices can change until a booking is confirmed. Passengers must carry a valid passport and visa where required. Changes and cancellations follow the airline, hotel and package supplier rules shown at booking."},refund:{t:"Refund Policy",b:"Refunds follow the airline / hotel / supplier policy for the booked fare or package. Service charges may be non-refundable. Any advance taken directly by a service provider is refunded by that provider by the method agreed with them, within the time stated when you booked."}};
-export default function Legal({params}){const p=pages[params.slug]||pages.privacy;return(<main className="wrap page" style={{maxWidth:820}}><h1>{p.t}</h1><div className="panel"><p>{p.b}</p><p className="muted">Draft text — the owner should replace this with their final legal text before launch.</p></div></main>)}
+"use client";
+import { useEffect, useState } from "react";
+import { apiFetch } from "../../../lib/api";
+
+export default function Legal({ params }) {
+  const slug = params?.slug || "privacy";
+  const [page, setPage] = useState(null);
+
+  useEffect(() => {
+    apiFetch(`/legal/${encodeURIComponent(slug)}`)
+      .then((data) => setPage(data))
+      .catch(() => setPage({ title: "Legal Information", content: "Unable to load policy." }));
+  }, [slug]);
+
+  return (
+    <main className="wrap page" style={{ maxWidth: 820 }}>
+      <h1>{page?.title || "Loading..."}</h1>
+      <div className="panel">
+        <p>{page?.content || "Loading policy text..."}</p>
+      </div>
+    </main>
+  );
+}

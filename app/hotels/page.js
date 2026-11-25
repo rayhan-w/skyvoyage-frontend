@@ -1,2 +1,41 @@
-import {hotels,fmt} from "../../lib/data";import QueryForm from "../../components/QueryForm";
-export default function Hotels(){return(<main className="wrap page"><h1>Hotels</h1><p className="sub">Hand-picked hotels at the best price — per night</p><div className="grid3">{hotels.map(h=><div className="card" key={h.name}><img src={h.img}/><div className="p"><b>{h.name}</b><p className="muted">{h.city} · {"★".repeat(h.stars)}</p><div className="price">{fmt(h.price)} <small className="muted">/ night</small></div><br/><a className="btn" href={"/contact?service="+encodeURIComponent(h.name)}>Book by Phone →</a></div></div>)}</div><h2 style={{marginTop:36}}>Hotel Query</h2><QueryForm type="Hotels"/></main>)}
+"use client";
+import { useEffect, useState } from "react";
+import QueryForm from "../../components/QueryForm";
+import { apiFetch, fmt } from "../../lib/api";
+
+export default function Hotels() {
+  const [hotels, setHotels] = useState([]);
+
+  useEffect(() => {
+    apiFetch("/hotels")
+      .then((data) => setHotels(data || []))
+      .catch(() => {});
+  }, []);
+
+  return (
+    <main className="wrap page">
+      <h1>Hotels</h1>
+      <p className="sub">Hand-picked hotels at the best price — per night</p>
+      <div className="grid3">
+        {hotels.map((h) => (
+          <div className="card" key={h.id || h.name}>
+            <img src={h.img} alt={h.name} />
+            <div className="p">
+              <b>{h.name}</b>
+              <p className="muted">{h.city} · {"★".repeat(h.stars)}</p>
+              <div className="price">
+                {fmt(h.price)} <small className="muted">/ night</small>
+              </div>
+              <br />
+              <a className="btn" href={"/contact?service=" + encodeURIComponent(h.name)}>
+                Book by Phone →
+              </a>
+            </div>
+          </div>
+        ))}
+      </div>
+      <h2 style={{ marginTop: 36 }}>Hotel Query</h2>
+      <QueryForm type="Hotels" />
+    </main>
+  );
+}

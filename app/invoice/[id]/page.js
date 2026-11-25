@@ -1,3 +1,100 @@
-export function generateStaticParams(){return[{id:"SV-1001"},{id:"SV-1002"}]}
-import {fmt} from "../../../lib/data";
-export default function Invoice({params}){return(<main className="wrap page" style={{maxWidth:760}}><div className="panel"><h1 style={{color:"#c2410c"}}>SkyVoyage — Invoice</h1><p><b>Invoice No:</b> INV-{params.id}<br/><b>Booking ID:</b> {params.id}<br/><b>Customer:</b> Demo Customer · demo@email.com<br/><b>Date:</b> 12 Nov 2026</p><table><thead><tr><th>Description</th><th>Qty</th><th>Amount</th></tr></thead><tbody><tr><td>Flight DAC → DXB · Economy · Biman Bangladesh</td><td>1</td><td>{fmt(31000)}</td></tr><tr><td>Taxes & Fees</td><td>1</td><td>{fmt(1500)}</td></tr><tr><td><b>Total</b></td><td></td><td><b>{fmt(32500)}</b></td></tr></tbody></table><p className="muted">Booking summary only — no online payment. To confirm, call us at +880 1234 567890 or WhatsApp us.</p><button className="btn">Download PDF (backend)</button></div></main>)}
+"use client";
+import { useEffect, useState } from "react";
+import { apiFetch, fmt, getPdfUrl } from "../../../lib/api";
+
+export default function Invoice({ params }) {
+  const id = decodeURIComponent(params?.id || "");
+  const [inv, setInv] = useState(null);
+  const [settings, setSettings] = useState(null);
+  const [err, setErr] = useState("");
+
+  useEffect(() => {
+    apiFetch("/settings")
+      .then((s) => setSettings(s))
+      .catch(() => {});
+
+    if (id) {
+      apiFetch(`/invoices/${encodeURIComponent(id)}`)
+        .then((data) => setInv(data))
+        .catch((e) => setErr(e.message || "Invoice not found"));
+    }
+  }, [id]);
+
+  if (err) {
+    return (
+      <main className="wrap page" style={{ maxWidth: 760 }}>
+        <div className="panel">{err}</div>
+      </main>
+    );
+  }
+
+  if (!inv) {
+    return (
+      <main className="wrap page" style={{ maxWidth: 760 }}>
+        <div className="panel">Loading invoice...</div>
+      </main>
+    );
+  }
+
+  const tax = Math.round(inv.totalAmount * 0.046);
+  const phone = settings?.bookingPhone || settings?.phoneHotline || "";
+
+  return (
+    <main className="wrap page" style={{ maxWidth: 760 }}>
+      <div className="panel">
+        <h1 style={{ color: "#c2410c" }}>SkyVoyage — Invoice</h1>
+        <p>
+          <b>Invoice No:</b> {inv.invoiceNo}
+          <br />
+          <b>Booking ID:</b> {inv.booking?.bookingCode}
+          <br />
+          <b>Customer:</b> {inv.customerName} · {inv.customerEmail}
+          <br />
+          <b>Date:</b> {inv.booking?.travelDate}
+          <br />
+          <b>Status:</b> {inv.status}
+        </p>
+        <div className="tablewrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Description</th>
+                <th>Qty</th>
+                <th>Amount</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>{inv.itemDescription}</td>
+                <td>1</td>
+                <td>{fmt(inv.totalAmount - tax)}</td>
+              </tr>
+              <tr>
+                <td>Taxes & Fees</td>
+                <td>1</td>
+                <td>{fmt(tax)}</td>
+              </tr>
+              <tr>
+                <td><b>Total</b></td>
+                <td></td>
+                <td><b>{fmt(inv.totalAmount)}</b></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p className="muted">
+          Booking summary only — no online payment. To confirm, call us at {phone} or WhatsApp us.
+        </p>
+        <a
+          className="btn"
+          href={getPdfUrl(inv.invoiceNo)}
+          target="_blank"
+          rel="noopener noreferrer"
+          download={`${inv.invoiceNo}.pdf`}
+        >
+          Download PDF
+        </a>
+      </div>
+    </main>
+  );
+}
