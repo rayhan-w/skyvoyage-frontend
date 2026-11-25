@@ -1,0 +1,5 @@
+"use client";import {useState} from "react";import {useRouter} from "next/navigation";
+export default function ALogin(){const r=useRouter();const[err,setErr]=useState("");
+return(<div style={{maxWidth:460}}><h1 style={{marginTop:0}}>Admin Login</h1><form className="form" style={{gridTemplateColumns:"1fr"}} onSubmit={e=>{e.preventDefault();const f=new FormData(e.target);if(f.get("email")==="admin@skyvoyage.com"&&f.get("pass")==="admin123"){sessionStorage.setItem("sv_admin","1");r.push("/admin")}else setErr("Wrong email or password. Demo: admin@skyvoyage.com / admin123")}}>
+<label>Admin Email<input name="email" type="email" required placeholder="admin@skyvoyage.com"/></label><label>Password<input name="pass" type="password" required placeholder="admin123"/></label>
+{err&&<p style={{color:"#c62828"}}>{err}</p>}<button className="btn">Login to Admin Panel</button><p className="muted">Demo login for the frontend preview. The backend will replace this with secure admin authentication. Never share real credentials in chat.</p></form></div>)}

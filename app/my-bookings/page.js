@@ -1,0 +1,5 @@
+"use client";import {useEffect,useState} from "react";import Link from "next/link";import {fmt,readItems} from "../../lib/data";
+const demo=[{id:"SV-1001",item:"DAC to DXB · Biman Bangladesh",date:"12 Nov 2026",status:"Confirmed",total:32500,inv:"INV-SV-1001"}];
+export default function Bookings(){const[mine,setMine]=useState([]);useEffect(()=>{setMine(readItems("sv_bookings"))},[]);
+const rows=[...mine.map(b=>({id:b.id,item:b.item,date:b.date,status:b.status,total:b.total,inv:b.inv})),...demo];
+return(<main className="wrap page"><h1>My Bookings</h1><div className="panel"><div className="tablewrap"><table><thead><tr><th>Booking ID</th><th>Item</th><th>Date</th><th>Status</th><th>Total</th><th>Invoice</th></tr></thead><tbody>{rows.map(b=><tr key={b.id}><td>{b.id}</td><td>{b.item}</td><td>{b.date}</td><td>{b.status}</td><td>{fmt(b.total)}</td><td><Link href={"/invoice-view?id="+b.id} style={{color:"#ea580c",fontWeight:700}}>View Invoice</Link></td></tr>)}</tbody></table></div><p className="muted">Bookings you make on this device appear here instantly, and also in the Admin Panel.</p></div></main>)}

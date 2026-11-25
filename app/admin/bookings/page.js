@@ -1,0 +1,5 @@
+"use client";import {useEffect,useState} from "react";import {fmt,readItems} from "../../../lib/data";
+const demo=[["SV-1001","Demo Customer","DAC to DXB — Biman","12 Nov 2026","Confirmed",32500],["SV-1002","Demo Customer","Dubai Explorer Package","20 Nov 2026","Requested",68500]];
+export default function ABookings(){const[mine,setMine]=useState([]);useEffect(()=>{setMine(readItems("sv_bookings"))},[]);
+const rows=[...mine.map(b=>[b.id,b.name,b.item,b.date,b.status,b.total]),...demo];
+return(<div><h1 style={{marginTop:0}}>Bookings</h1><div className="panel"><div className="tablewrap"><table><thead><tr><th>ID</th><th>Customer</th><th>Item</th><th>Date</th><th>Status</th><th>Total</th></tr></thead><tbody>{rows.map(r=><tr key={r[0]}><td>{r[0]}</td><td>{r[1]}</td><td>{r[2]}</td><td>{r[3]}</td><td>{r[4]}</td><td>{fmt(r[5])}</td></tr>)}</tbody></table></div><p className="muted">Bookings made on this device appear at the top instantly. With the backend, all customers' bookings will appear here.</p></div></div>)}

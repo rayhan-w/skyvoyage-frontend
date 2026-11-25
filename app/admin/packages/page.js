@@ -1,0 +1,5 @@
+import {readyPackages,upcomingPackages,fmt} from "../../../lib/data";
+export default function APackages(){return(<div><h1 style={{marginTop:0}}>Packages</h1><div style={{display:"flex",gap:10,marginBottom:16}}><button className="btn">+ Add Ready Package</button><button className="btn">+ Add Upcoming Package</button></div>
+<div className="panel"><h3>Ready Packages</h3><div className="tablewrap"><table><thead><tr><th>Name</th><th>Duration</th><th>Price</th><th>Action</th></tr></thead><tbody>{readyPackages.map(p=><tr key={p.name}><td>{p.name}</td><td>{p.days}</td><td>{fmt(p.price)}</td><td>Edit · Delete</td></tr>)}</tbody></table></div>
+<h3>Upcoming Packages</h3><div className="tablewrap"><table><thead><tr><th>Name</th><th>Duration</th><th>Departure</th><th>Price</th><th>Action</th></tr></thead><tbody>{upcomingPackages.map(p=><tr key={p.name}><td>{p.name}</td><td>{p.days}</td><td>{p.date}</td><td>{fmt(p.price)}</td><td>Edit · Delete</td></tr>)}</tbody></table></div>
+<p className="muted">Custom Package requests arrive as Queries. Add/Edit forms will save when the backend is connected.</p></div></div>)}

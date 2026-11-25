@@ -1,0 +1,5 @@
+"use client";import {useEffect,useState} from "react";import {readItems} from "../../../lib/data";
+const demo=[["Q-501","Karim Hossain","Custom Package","Cox's Bazar 3 days, 4 persons, budget 60k","New"],["Q-502","Nusrat Jahan","Visa","Dubai tourist visa documents?","Replied"]];
+export default function AQueries(){const[mine,setMine]=useState([]);useEffect(()=>{setMine(readItems("sv_queries"))},[]);
+const rows=[...mine.map(q=>[q.id,q.name,q.type,q.message,q.status]),...demo];
+return(<div><h1 style={{marginTop:0}}>Queries / Enquiries</h1><p className="sub">Queries sent from the website on this device appear at the top. With the backend, every customer's query lands here and replies go by email.</p><div className="panel"><div className="tablewrap"><table><thead><tr><th>ID</th><th>Customer</th><th>Type</th><th>Message</th><th>Status</th></tr></thead><tbody>{rows.map(r=><tr key={r[0]}><td>{r[0]}</td><td>{r[1]}</td><td>{r[2]}</td><td>{r[3]}</td><td>{r[4]}</td></tr>)}</tbody></table></div></div></div>)}

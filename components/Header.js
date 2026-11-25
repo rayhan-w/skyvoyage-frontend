@@ -1,0 +1,6 @@
+"use client";import Link from "next/link";import {useState,useEffect} from "react";
+export default function Header(){const[open,setOpen]=useState(false);const[sc,setSc]=useState(false);useEffect(()=>{const f=()=>setSc(window.scrollY>10);f();window.addEventListener("scroll",f,{passive:true});return ()=>window.removeEventListener("scroll",f)},[]);const close=()=>setOpen(false);
+return(<><div className="topbar"><div className="wrap topin"><span>+880 1234 567890</span><span>info@skyvoyage.com</span><span className="topright">Dhaka, Bangladesh · EN</span></div></div>
+<header className={"header"+(sc?" scrolled":"")}><div className="wrap nav"><Link href="/" className="logo" onClick={close}><span className="plane">✈</span><span className="logotext">Sky<span>Voyage</span><small>Fly More · Explore More</small></span></Link>
+<button className="burger" aria-label="Menu" onClick={()=>setOpen(!open)}>{open?"✕":"☰"}</button>
+<nav className={open?"links open":"links"}><Link href="/" onClick={close}>Home</Link><Link href="/packages" onClick={close}>Packages</Link><Link href="/contact" onClick={close}>Inquiry</Link><Link href="/about" onClick={close}>About Us</Link><Link href="/contact" onClick={close}>Contact</Link><Link href="/flights" className="bookbtn" onClick={close}>Book Now</Link></nav></div></header></>)}
