@@ -66,14 +66,28 @@ function Inner() {
 
   if (done) {
     return (
-      <div className="panel">
-        <h2>Booking Request Received!</h2>
+      <div className="panel" style={{ padding: 28 }}>
+        <span
+          style={{
+            display: "inline-block",
+            background: "#dcfce7",
+            color: "#166534",
+            fontWeight: 800,
+            fontSize: 12,
+            padding: "5px 12px",
+            borderRadius: 999,
+            marginBottom: 10,
+          }}
+        >
+          REQUEST RECEIVED
+        </span>
+        <h2 style={{ marginTop: 0 }}>Booking Request Received!</h2>
         <p>
           Request ID: <b>{done.booking.bookingCode}</b>
         </p>
         <p>
           {done.booking.customerName} · {done.booking.itemTitle} ·{" "}
-          {done.booking.travelDate} · Approx. {fmt(done.booking.totalAmount)}
+          {done.booking.travelDate} · Approx. <b>{fmt(done.booking.totalAmount)}</b>
         </p>
         <p>
           <b>
@@ -81,7 +95,7 @@ function Inner() {
             everything by phone:
           </b>
         </p>
-        <div style={{ display: "flex", gap: 10, flexWrap: "wrap", margin: "14px 0" }}>
+        <div style={{ display: "flex", gap: 10, flexWrap: "wrap", margin: "16px 0" }}>
           <a className="btn" href={telHref(phone)}>
             Call {phone}
           </a>
@@ -94,25 +108,12 @@ function Inner() {
             WhatsApp Us
           </a>
           <Link
-            className="btn"
-            style={{
-              background: "#fff",
-              color: "#ea580c",
-              border: "2px solid #ea580c",
-            }}
+            className="btn ghost"
             href={"/invoice/" + encodeURIComponent(done.booking.bookingCode)}
           >
             View Invoice
           </Link>
-          <Link
-            className="btn"
-            style={{
-              background: "#fff",
-              color: "#ea580c",
-              border: "2px solid #ea580c",
-            }}
-            href="/contact"
-          >
+          <Link className="btn ghost" href="/contact">
             Contact Page
           </Link>
         </div>
@@ -122,7 +123,7 @@ function Inner() {
           Bookings and the Admin Panel.
         </p>
         <button className="btn" onClick={() => r.push("/my-bookings")}>
-          Go to My Bookings
+          Go to My Bookings →
         </button>
       </div>
     );
@@ -165,30 +166,52 @@ function Inner() {
 
   return (
     <div>
-      <h1>Booking Request</h1>
-      <p className="sub">
-        {sel.title} · {sel.sub} · {sel.date} · <b>{fmt(sel.price)}</b>
-      </p>
+      <h1 style={{ marginBottom: 14 }}>Booking Request</h1>
+      <div
+        className="panel"
+        style={{
+          marginBottom: 18,
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          gap: 14,
+          flexWrap: "wrap",
+          borderLeft: "4px solid #ea580c",
+        }}
+      >
+        <div>
+          <b style={{ fontSize: 18, display: "block" }}>{sel.title}</b>
+          <span className="muted">
+            {sel.sub} · {sel.date}
+          </span>
+        </div>
+        <div style={{ textAlign: "right" }}>
+          <div className="price">{fmt(sel.price)}</div>
+          <span className="muted" style={{ fontSize: 12 }}>
+            Confirm by phone · No online payment
+          </span>
+        </div>
+      </div>
       <p className="sub">
         Fill in your details and send the request — then call or WhatsApp us at{" "}
-        <b>{phone}</b> to confirm. No online payment needed.
+        <b>{phone}</b> to confirm.
       </p>
       <form className="form" onSubmit={handleSubmit}>
         <label>
           Full Name
-          <input name="name" required />
+          <input name="name" required placeholder="Your full name" />
         </label>
         <label>
           Mobile (we will call this number)
-          <input name="mobile" required />
+          <input name="mobile" required placeholder="+8801XXXXXXXXX" />
         </label>
         <label>
           Email
-          <input name="email" type="email" required />
+          <input name="email" type="email" required placeholder="you@email.com" />
         </label>
         <label>
           Passport / NID No
-          <input name="passport" />
+          <input name="passport" placeholder="Optional" />
         </label>
         <label className="wide">
           Anything we should know?
@@ -213,7 +236,7 @@ function Inner() {
 
 export default function Book() {
   return (
-    <main className="wrap page" style={{ maxWidth: 760 }}>
+    <main className="wrap page" style={{ maxWidth: 780 }}>
       <Suspense>
         <Inner />
       </Suspense>

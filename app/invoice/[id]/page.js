@@ -1,4 +1,5 @@
 "use client";
+import Link from "next/link";
 import { useEffect, useState } from "react";
 import { apiFetch, fmt, getPdfUrl } from "../../../lib/api";
 
@@ -40,20 +41,63 @@ export default function Invoice({ params }) {
   const phone = settings?.bookingPhone || settings?.phoneHotline || "";
 
   return (
-    <main className="wrap page" style={{ maxWidth: 760 }}>
-      <div className="panel">
-        <h1 style={{ color: "#c2410c" }}>SkyVoyage — Invoice</h1>
-        <p>
-          <b>Invoice No:</b> {inv.invoiceNo}
-          <br />
-          <b>Booking ID:</b> {inv.booking?.bookingCode}
-          <br />
-          <b>Customer:</b> {inv.customerName} · {inv.customerEmail}
-          <br />
-          <b>Date:</b> {inv.booking?.travelDate}
-          <br />
-          <b>Status:</b> {inv.status}
-        </p>
+    <main className="wrap page" style={{ maxWidth: 780 }}>
+      <div className="panel" style={{ padding: 28 }}>
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            flexWrap: "wrap",
+            gap: 12,
+            borderBottom: "2px solid #f1f5f9",
+            paddingBottom: 16,
+            marginBottom: 18,
+          }}
+        >
+          <div>
+            <h1 style={{ color: "#c2410c", margin: "0 0 4px" }}>SkyVoyage — Invoice</h1>
+            <span className="muted">Booking Summary (No Online Payment)</span>
+          </div>
+          <span
+            style={{
+              background: inv.status === "CONFIRMED" ? "#dcfce7" : "#ffedd5",
+              color: inv.status === "CONFIRMED" ? "#166534" : "#9a3412",
+              padding: "6px 14px",
+              borderRadius: 999,
+              fontWeight: 800,
+              fontSize: 13,
+            }}
+          >
+            {inv.status}
+          </span>
+        </div>
+
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "1fr 1fr",
+            gap: 16,
+            marginBottom: 20,
+            background: "#f8fafc",
+            padding: 16,
+            borderRadius: 12,
+          }}
+        >
+          <div>
+            <div className="muted" style={{ fontSize: 12 }}>INVOICE DETAILS</div>
+            <div><b>Invoice No:</b> {inv.invoiceNo}</div>
+            <div><b>Booking ID:</b> {inv.booking?.bookingCode}</div>
+            <div><b>Travel Date:</b> {inv.booking?.travelDate}</div>
+          </div>
+          <div>
+            <div className="muted" style={{ fontSize: 12 }}>CUSTOMER</div>
+            <div><b>{inv.customerName}</b></div>
+            <div>{inv.customerEmail}</div>
+            <div>{inv.customerMobile}</div>
+          </div>
+        </div>
+
         <div className="tablewrap">
           <table>
             <thead>
@@ -77,23 +121,30 @@ export default function Invoice({ params }) {
               <tr>
                 <td><b>Total</b></td>
                 <td></td>
-                <td><b>{fmt(inv.totalAmount)}</b></td>
+                <td><b className="price">{fmt(inv.totalAmount)}</b></td>
               </tr>
             </tbody>
           </table>
         </div>
-        <p className="muted">
-          Booking summary only — no online payment. To confirm, call us at {phone} or WhatsApp us.
+
+        <p className="muted" style={{ marginTop: 16 }}>
+          Booking summary only — no online payment. To confirm, call us at <b>{phone}</b> or WhatsApp us.
         </p>
-        <a
-          className="btn"
-          href={getPdfUrl(inv.invoiceNo)}
-          target="_blank"
-          rel="noopener noreferrer"
-          download={`${inv.invoiceNo}.pdf`}
-        >
-          Download PDF
-        </a>
+
+        <div style={{ display: "flex", gap: 10, flexWrap: "wrap", marginTop: 14 }}>
+          <a
+            className="btn"
+            href={getPdfUrl(inv.invoiceNo)}
+            target="_blank"
+            rel="noopener noreferrer"
+            download={`${inv.invoiceNo}.pdf`}
+          >
+            Download PDF
+          </a>
+          <Link className="btn ghost" href="/my-bookings">
+            Back to My Bookings
+          </Link>
+        </div>
       </div>
     </main>
   );

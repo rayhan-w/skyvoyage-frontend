@@ -1,4 +1,5 @@
 "use client";
+import Link from "next/link";
 import { Suspense, useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { apiFetch, fmt, getPdfUrl } from "../../lib/api";
@@ -28,8 +29,8 @@ function Inner() {
   const phone = settings?.bookingPhone || settings?.phoneHotline || "";
 
   return (
-    <div className="panel">
-      <h1 style={{ color: "#c2410c" }}>SkyVoyage — Invoice</h1>
+    <div className="panel" style={{ padding: 28 }}>
+      <h1 style={{ color: "#c2410c", marginTop: 0 }}>SkyVoyage — Invoice</h1>
       <p>
         <b>Invoice No:</b> {inv.invoiceNo}
         <br />
@@ -64,30 +65,35 @@ function Inner() {
             <tr>
               <td><b>Total</b></td>
               <td></td>
-              <td><b>{fmt(inv.totalAmount)}</b></td>
+              <td><b className="price">{fmt(inv.totalAmount)}</b></td>
             </tr>
           </tbody>
         </table>
       </div>
       <p className="muted">
-        Booking summary only — no online payment. To confirm, call us at {phone} or WhatsApp us.
+        Booking summary only — no online payment. To confirm, call us at <b>{phone}</b> or WhatsApp us.
       </p>
-      <a
-        className="btn"
-        href={getPdfUrl(inv.invoiceNo)}
-        target="_blank"
-        rel="noopener noreferrer"
-        download={`${inv.invoiceNo}.pdf`}
-      >
-        Download PDF
-      </a>
+      <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
+        <a
+          className="btn"
+          href={getPdfUrl(inv.invoiceNo)}
+          target="_blank"
+          rel="noopener noreferrer"
+          download={`${inv.invoiceNo}.pdf`}
+        >
+          Download PDF
+        </a>
+        <Link className="btn ghost" href="/my-bookings">
+          Back to My Bookings
+        </Link>
+      </div>
     </div>
   );
 }
 
 export default function Inv() {
   return (
-    <main className="wrap page" style={{ maxWidth: 760 }}>
+    <main className="wrap page" style={{ maxWidth: 780 }}>
       <Suspense>
         <Inner />
       </Suspense>
